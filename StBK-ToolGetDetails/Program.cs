@@ -15,7 +15,7 @@ internal class Program
     private static Logger _logger = LogManager.GetCurrentClassLogger();
 
     //// DEV SECTION
-    //private static string _companyRid = "10-05-8E-D4-7D-56-83-2E-D5-F9-55-60-E0-93-D2-79";
+    private static string _companyRid = "10-05-8E-D4-7D-56-83-2E-D5-F9-55-60-E0-93-D2-79";
     //private static string _personRid = "BB-C5-DF-FF-5D-B0-F5-62-F3-1B-EC-11-37-28-CD-75";
     //private static string _personRidLangeAdresse = "00-CC-7F-B4-D1-8A-09-68-72-A7-76-7F-6E-C5-B0-C0"; // LANGE Adresse
     //private static string _personRidKeineAdresse = "06-4D-3C-41-CB-F9-72-04-57-C4-5C-1B-0B-2B-FE-7F"; // KEINE Adresse PROBLEM
@@ -34,7 +34,7 @@ internal class Program
     public static async Task RunApplication()
     {
         var url = AppSettingsHelper.ReadSettings("HttpSettings", "HostUrl");
-        var nextRidNotChecked = string.Empty;
+        var nextRidNotChecked = String.Empty;
 
         await using var connection = await StbkConnection.CreateAsync();
 
@@ -45,44 +45,44 @@ internal class Program
             //var ds = GetNextRidFromDb(connection, StBKConst.QueryGetNextRid);
             //var reader = await connection.GetDataSet(StBKConst.QueryGetNextRid);
 
-            await foreach (var entry in connection.GetDataSet(StBKConst.QueryGetNextRid))
-            {
-                // DEV SECTION
-                //var responseBody = await GetRidDetailsPageContent(url, _companyRid, _delay);
-                //var responseBody = await GetRidDetailsPageContent(url, _personRid, _delay);
-                //var responseBody = await GetRidDetailsPageContent(url, _personRidLangeAdresse, _delay);
-                //var responseBody = await GetRidDetailsPageContent(url, _personRidKeineAdresse, _delay);
-                //var responseBody = await GetRidDetailsPageContent(url, _personRidZweiVornamen, _delay);
-                //var responseBody = await GetRidDetailsPageContent(url, _personRidAdelsTitel, _delay);
+            //await foreach (var entry in connection.GetDataSet(StBKConst.QueryGetNextRid))
+            //{
+            // DEV SECTION
+            var responseBody = await GetRidDetailsPageContent(url, _companyRid, _delay);
+            //var responseBody = await GetRidDetailsPageContent(url, _personRid, _delay);
+            //var responseBody = await GetRidDetailsPageContent(url, _personRidLangeAdresse, _delay);
+            //var responseBody = await GetRidDetailsPageContent(url, _personRidKeineAdresse, _delay);
+            //var responseBody = await GetRidDetailsPageContent(url, _personRidZweiVornamen, _delay);
+            //var responseBody = await GetRidDetailsPageContent(url, _personRidAdelsTitel, _delay);
 
-                nextRidNotChecked = entry["Rid"].ToString();
-                var responseBody = await GetRidDetailsPageContent(url, nextRidNotChecked, _delay);
-                var detailPageContent = ExamineResponseContentType(responseBody, StBKConst.XPathDetailsPageAll, "id");
+            //nextRidNotChecked = entry["Rid"].ToString();
+            //var responseBody = await GetRidDetailsPageContent(url, nextRidNotChecked, _delay);
+            var detailPageContent = ExamineResponseContentType(responseBody, StBKConst.XPathDetailsPageAll, "id");
 
                 switch (detailPageContent)
                 {
                     // No details page method
                     case SearchResultEnum.DetailsPageNone:
-                        _logger.Info("No result found for Id: {0}", entry);
+                        _logger.Info("No result found for Id: {0}", _companyRid);
                         DbHelper.UpdateNoDetailsPageStatusToDb(connection, nextRidNotChecked, StBKConst.TxtNone);
                         Console.WriteLine($"Details page for Rid { nextRidNotChecked } not found.");
                         break;
                     // Company details page method
                     case SearchResultEnum.DetailsPageCompany:
-                        _logger.Info("The Id: {0}, passed belongs to a company.", entry);
+                        _logger.Info("The passed Id: {0}, belongs to a company.", _companyRid);
                         var companyData = XpathHelper.GetCompanyDataFromResponse(responseBody);
                         DbHelper.UpdateCompanyDetailsPageStatusToDb(connection, nextRidNotChecked, StBKConst.TxtCompany, companyData);
                         Console.WriteLine($"Details page for Rid { nextRidNotChecked } found. ({ StBKConst.TxtCompany })");
                         break;
                     // Person details page method
                     default:
-                        _logger.Info("The Id: {0}, passed belongs to a person.", entry);
+                        _logger.Info("The passed Id: {0}, belongs to a person.", _companyRid);
                         var personData = XpathHelper.GetPersonDataResponse(responseBody);
                         DbHelper.UpdatePersonDetailsPageStatusToDb(connection, nextRidNotChecked, StBKConst.TxtPerson, personData);
                         Console.WriteLine($"Details page for Rid { nextRidNotChecked } found. ({ StBKConst.TxtPerson })");
                         break;
                 }
-            }
+            //}
         }
         catch (Exception ex) { _logger.Fatal(ex, "Stopped program because of exception"); }
         finally
