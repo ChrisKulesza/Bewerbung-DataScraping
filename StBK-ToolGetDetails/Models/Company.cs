@@ -1,9 +1,8 @@
-﻿namespace StBK_ToolGetDetails.Models
+﻿namespace StBK_ToolGetDetails.Models;
+
+public class Company
 {
-    public class Company
-    {
-        public string Name { get; set; }
-        public string Kammer { get; set; }
-        public string Adresse { get; set; }
-    }
+  public string Name { get; set; }
+  public string Kammer { get; set; }
+  public string Adresse { get; set; }
 }
