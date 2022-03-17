@@ -3,6 +3,9 @@ using System;
 
 namespace StBK_ToolGetDetails.Helper;
 
+/// <summary>
+/// Solution from github.com <see href="https://github.com/NLog/NLog/issues/3556#issuecomment-523621069">NLog Github Discussion</see>
+/// </summary>
 internal class NLogExtensions
 {
   public class OverrideValueFormatter : IValueFormatter
